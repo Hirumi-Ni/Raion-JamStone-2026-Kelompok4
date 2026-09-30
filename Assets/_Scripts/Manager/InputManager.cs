@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class InputManager : MonoBehaviour
 {
@@ -52,5 +53,23 @@ public class InputManager : MonoBehaviour
     {
         if (playerControls == null) return false;
         return playerControls.Player.Interact.WasPressedThisFrame();
+    }
+
+    public bool GetLeftClickDown()
+    {
+        if (playerControls == null) return false;
+        return playerControls.Player.LeftClick.WasPerformedThisFrame();
+    }
+
+    public bool GetLeftClickHeld()
+    {
+        if (playerControls == null) return false;
+        return playerControls.Player.LeftClick.IsPressed();
+    }
+
+    public Vector2 GetMousePosition()
+    {
+        if (Mouse.current != null) return Mouse.current.position.ReadValue();
+        return Vector2.zero;
     }
 }
