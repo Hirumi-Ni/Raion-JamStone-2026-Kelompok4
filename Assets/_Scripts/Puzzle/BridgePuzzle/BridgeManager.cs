@@ -20,6 +20,6 @@ public class BridgeManager : MonoBehaviour
         Color c = bridgeHighlight.color;
         c.a = 1f; 
         bridgeHighlight.color = c;
-        Debug.Log("Bridge Complete! Player can cross.");
+        Debug.Log("Done");
     }
 }
