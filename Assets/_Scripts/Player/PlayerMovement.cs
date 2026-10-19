@@ -6,26 +6,23 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float walkSpeed = 8f;
     [SerializeField] private float runSpeed = 16f;
 
-    [Header("Slope")]
-    [SerializeField] private float maxSlopeAngle = 50f;
-    [SerializeField] private float surfaceAnchorDistance = 0.1f;
+    [Header("Jump")]
+    [SerializeField] private float jumpForce = 14f;
 
-    [Header("Ground")]
+    [Header("Ground Check")]
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private float groundCheckRadius = 0.15f;
     [SerializeField] private LayerMask groundLayer;
 
     private Vector2 moveInput;
-    private bool isMoving;
     private bool isSprinting;
     private bool isGrounded;
+    private bool isJumping;
+    private bool isMoving;
 
     #region [Components]
     private Rigidbody2D rb;
     private Animator anim;
-    #endregion
-
-    #region [Slide]
-    private Rigidbody2D.SlideMovement slideMovement;
-    private Rigidbody2D.SlideResults slideResults;
     #endregion
 
     #region [Unity Lifecycle]
@@ -34,11 +31,9 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponentInChildren<Animator>();
 
-        rb.bodyType = RigidbodyType2D.Kinematic;
-        rb.gravityScale = 0f;
+        rb.bodyType = RigidbodyType2D.Dynamic;
         rb.freezeRotation = true;
-
-        SetupSlideMovement();
+        rb.interpolation = RigidbodyInterpolation2D.Interpolate;
     }
 
     private void Update()
@@ -50,25 +45,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        //CheckGround(); sementara gk bisa lompat nanti kode lompatnya ku hapus kalau emang gak ada lompat
         HandleMoving();
-    }
-    #endregion
-
-    #region [Setup]
-    private void SetupSlideMovement()
-    {
-        slideMovement = new Rigidbody2D.SlideMovement
-        {
-            surfaceUp = Vector2.up,
-            surfaceAnchor = Vector2.down * surfaceAnchorDistance,
-            surfaceSlideAngle = maxSlopeAngle,
-            maxIterations = 5,
-            gravity = Vector2.zero,
-            layerMask = groundLayer,
-            useLayerMask = true,
-            useAttachedTriggers = false,
-            useSimulationMove = true
-        };
     }
     #endregion
 
@@ -79,6 +57,11 @@ public class PlayerMovement : MonoBehaviour
         moveInput.y = 0f;
 
         if (moveInput.magnitude > 1f) moveInput.Normalize();
+
+        //if (InputManager.Instance.GetPlayerJumpPressed())
+        //{
+        //    Jump();
+        //}
     }
     #endregion
 
@@ -87,26 +70,34 @@ public class PlayerMovement : MonoBehaviour
     {
         isSprinting = InputManager.Instance.GetPlayerSprinting();
         float speed = isSprinting ? runSpeed : walkSpeed;
-
-        Vector2 velocity = new Vector2(moveInput.x * speed, 0f);
-        slideResults = rb.Slide(velocity, Time.fixedDeltaTime, slideMovement);
-
-        UpdateGrounded();
+        rb.linearVelocity = new Vector2(moveInput.x * speed, rb.linearVelocity.y);
     }
+
+    //public void Jump() ku matiin sementara ntar kalo mau dipake di uncomment aja
+    //{
+    //    if (!isGrounded) return;
+
+    //    rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+    //    isGrounded = false;
+    //    isJumping = true;
+    //}
     #endregion
 
     #region [Ground]
-    private void UpdateGrounded()
+    private void CheckGround()
     {
-        isGrounded = false;
-
-        if (!slideResults.surfaceHit) return;
-
-        Vector2 normal = slideResults.surfaceHit.normal;
-        float angle = Vector2.Angle(normal, Vector2.up);
-        if (angle <= maxSlopeAngle)
+        if (groundCheck == null)
         {
-            isGrounded = true;
+            isGrounded = false;
+            return;
+        }
+
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer) != null;
+
+        // Land only when grounded and no longer moving up, so the jump isn't cancelled on the first frame
+        if (isGrounded && rb.linearVelocity.y <= 0f)
+        {
+            isJumping = false;
         }
     }
     #endregion
@@ -114,13 +105,13 @@ public class PlayerMovement : MonoBehaviour
     #region [Animation]
     private void HandleAnimation()
     {
+        if (anim == null) return;
+
         isMoving = Mathf.Abs(moveInput.x) > 0.01f;
 
-        bool isWalking = isMoving && !isSprinting;
-        bool isRunning = isMoving && isSprinting;
-
-        anim.SetBool("isWalking", isWalking);
-        anim.SetBool("isRunning", isRunning);
+        anim.SetBool("isWalking", isMoving && !isSprinting);
+        anim.SetBool("isRunning", isMoving && isSprinting);
+        anim.SetBool("isJumping", isJumping);
     }
     #endregion
 
@@ -128,11 +119,19 @@ public class PlayerMovement : MonoBehaviour
     private void HandleFlip()
     {
         if (Mathf.Abs(moveInput.x) < 0.01f) return;
-        Vector3 localScale = transform.localScale;
 
-        if (moveInput.x > 0) localScale.x = Mathf.Abs(localScale.x);
-        else localScale.x = -Mathf.Abs(localScale.x);
+        Vector3 localScale = transform.localScale;
+        localScale.x = moveInput.x > 0 ? Mathf.Abs(localScale.x) : -Mathf.Abs(localScale.x);
         transform.localScale = localScale;
+    }
+    #endregion
+
+    #region [Gizmos]
+    private void OnDrawGizmosSelected()
+    {
+        if (groundCheck == null) return;
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
     }
     #endregion
 }
