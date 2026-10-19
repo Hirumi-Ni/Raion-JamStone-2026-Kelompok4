@@ -17,7 +17,7 @@ public class SolvedHandler : MonoBehaviour
         _segmentsToSolve = new();
         foreach (GameObject obj in _segmentObject)
         {
-            _segmentsToSolve.Add(obj.GetComponent<ISolveable>());
+            _segmentsToSolve.AddRange(obj.GetComponents<ISolveable>());
         }
     }
     private void OnEnable()
