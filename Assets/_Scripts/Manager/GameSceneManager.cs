@@ -6,6 +6,7 @@ public enum GameScene
 {
     MainMenu,
     SampleScene,
+    GameplayScene
     //isi aja scene mu bebas
 }
 
