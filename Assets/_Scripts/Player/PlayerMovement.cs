@@ -111,7 +111,7 @@ public class PlayerMovement : MonoBehaviour
 
         anim.SetBool("isWalking", isMoving && !isSprinting);
         anim.SetBool("isRunning", isMoving && isSprinting);
-        anim.SetBool("isJumping", isJumping);
+        //anim.SetBool("isJumping", isJumping);
     }
     #endregion
 
