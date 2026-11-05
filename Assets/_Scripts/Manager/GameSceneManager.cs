@@ -1,19 +1,20 @@
-//using EasyTransition;
+using EasyTransition;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public enum GameScene
 {
     MainMenu,
-    SampleScene,
-    GameplayScene
+    Stage1Scene,
+    Stage4Scene,
+    EndingScene
     //isi aja scene mu bebas
 }
 
 public class GameSceneManager : MonoBehaviour
 {
-    //[SerializeField] private TransitionSettings transitionMode;
-    //[SerializeField] private float loadDelay;
+    [SerializeField] private TransitionSettings transitionMode;
+    [SerializeField] private float loadDelay;
 
     public static GameSceneManager Instance { get; private set; }
 
@@ -34,13 +35,11 @@ public class GameSceneManager : MonoBehaviour
 
     public void ChangeScene(GameScene sceneEnum)
     {
-        SceneManager.LoadScene(sceneEnum.ToString());
-        //TransitionManager.Instance().Transition(sceneEnum.ToString(), transitionMode, loadDelay);
+        TransitionManager.Instance().Transition(sceneEnum.ToString(), transitionMode, loadDelay);
     }
 
     public void RestartScene()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().ToString());
-        //TransitionManager.Instance().Transition(SceneManager.GetActiveScene().name, transitionMode, loadDelay);
+        TransitionManager.Instance().Transition(CurrentScene, transitionMode, loadDelay);
     }
 }

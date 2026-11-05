@@ -22,7 +22,7 @@ MonoBehaviour:
   maxSmoothUnscaledTime: 0.15
   rewindCallbackMode: 0
   showUnityEditorReport: 0
-  logBehaviour: 0
+  logBehaviour: 2
   drawGizmos: 1
   defaultRecyclable: 0
   defaultAutoPlay: 3
@@ -48,6 +48,7 @@ MonoBehaviour:
     textMeshProEnabled: 0
     tk2DEnabled: 0
     deAudioEnabled: 0
+    deAudioV2Enabled: 0
     deUnityExtendedEnabled: 0
     epoOutlineEnabled: 0
   createASMDEF: 0
