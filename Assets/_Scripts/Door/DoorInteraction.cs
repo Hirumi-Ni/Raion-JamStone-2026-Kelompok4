@@ -1,12 +1,13 @@
 using UnityEngine;
 
-public class DoorInteraction : MonoBehaviour
+public class DoorInteraction : MonoBehaviour, IInteractable
 {
     [SerializeField] private GameScene _targetScene;
-    void OnTriggerEnter2D(Collider2D collision)
+
+    public Transform InteractableTransform => this.transform;
+    public void Interaction()
     {
         if (GameSceneManager.Instance==null) return;
-
-        if (collision.CompareTag("Player")) GameSceneManager.Instance.ChangeScene(_targetScene);
+        GameSceneManager.Instance.ChangeScene(_targetScene);
     }
 }
