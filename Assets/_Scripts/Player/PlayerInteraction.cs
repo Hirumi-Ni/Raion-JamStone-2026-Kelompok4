@@ -1,5 +1,6 @@
-using UnityEngine;
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerInteraction : MonoBehaviour
@@ -7,15 +8,30 @@ public class PlayerInteraction : MonoBehaviour
     #region Variabels
     [SerializeField] private InteractableEventChannel interactableEvent;
     private readonly List<IInteractable> _nearbyInteractables = new();
+    public event Action<IInteractable> OnClosestChanged;
     private IInteractable _closestInteractable;
+    public bool PuzzleOpen { get; private set; }
     #endregion
 
     #region Unity Methods
+    private void OnEnable()
+    {
+        interactableEvent.OnPuzzleRequested += HandlePuzzleOpened;
+        interactableEvent.OnClosedRequested += HandlePuzzleClosed;
+    }
+
+    private void OnDisable()
+    {
+        interactableEvent.OnPuzzleRequested -= HandlePuzzleOpened;
+        interactableEvent.OnClosedRequested -= HandlePuzzleClosed;
+    }
+
     private void Update()
     {
-        if (Keyboard.current.escapeKey.wasPressedThisFrame)
+        if (Keyboard.current.escapeKey.wasPressedThisFrame || InputManager.Instance.GetPlayerInteract() && PuzzleOpen)
         {
             StopInteraction();
+            return;
         }
         // Selalu bersihkan list dari objek yang mungkin dihancurkan
         CleanUpInvalidInteractables();
@@ -47,8 +63,7 @@ public class PlayerInteraction : MonoBehaviour
         if (collision.TryGetComponent<IInteractable>(out var interact))
         {
             _nearbyInteractables.Remove(interact);
-            if (_closestInteractable == interact) 
-                _closestInteractable = null;
+            GetClosestInteractable();
         }
     }
     #endregion
@@ -65,6 +80,7 @@ public class PlayerInteraction : MonoBehaviour
         _closestInteractable = null;
         target.Interaction();         
         CleanUpInvalidInteractables();
+        SetClosest(_closestInteractable);
     }
     private void StopInteraction()
     {
@@ -73,7 +89,7 @@ public class PlayerInteraction : MonoBehaviour
 
     private void GetClosestInteractable()
     {
-        _closestInteractable = null;
+        IInteractable _closestInteractable = null;
         float currentClosestDistance = float.MaxValue;  
         Vector3 playerPost = this.transform.position;
 
@@ -88,7 +104,17 @@ public class PlayerInteraction : MonoBehaviour
                 _closestInteractable = interactable;
                 currentClosestDistance = distance;
             }
-        }   
+        }
+
+        SetClosest(_closestInteractable);
+    }
+
+    private void SetClosest(IInteractable next)
+    {
+        if (next == _closestInteractable) return;
+        _closestInteractable = next;
+        OnClosestChanged?.Invoke(next);
+        Debug.Log("[Set Closest] Method Running");
     }
 
     private void CleanUpInvalidInteractables()
@@ -97,5 +123,8 @@ public class PlayerInteraction : MonoBehaviour
         // item.Equals(null) akan bernilai TRUE jika gameObject dari IInteractable tersebut sudah hancur.
         _nearbyInteractables.RemoveAll(item => item == null || item.Equals(null));
     }
+
+    private void HandlePuzzleOpened(PuzzleData _) => PuzzleOpen = true;
+    private void HandlePuzzleClosed() => PuzzleOpen = false;
     #endregion
 }

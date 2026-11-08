@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6347815660822913642
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3788282320833353862}
+  - component: {fileID: 9016067082055466310}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3788282320833353862
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6347815660822913642}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 950.5795, y: 522.3367, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9016067082055466310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6347815660822913642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54be948b6b9977942974b7d22443321c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AudioManager
+  BGM_Menu:
+    _entity: {fileID: 11400000, guid: 70e226096c077ff4380c54de0164a4c7, type: 2}
+    ID: 0
+    <DebugObject>k__BackingField: {fileID: 6347815660822913642}
+  BGM_Void:
+    _entity: {fileID: 11400000, guid: 46bc9cd878da36242b0680d137a09e6e, type: 2}
+    ID: 0
+    <DebugObject>k__BackingField: {fileID: 6347815660822913642}
+  BGM_Wind:
+    _entity: {fileID: 11400000, guid: 7e84f00f238c6e94992662d1558170fa, type: 2}
+    ID: 0
+    <DebugObject>k__BackingField: {fileID: 6347815660822913642}
+  BGM_Ending:
+    _entity: {fileID: 11400000, guid: a5b0cc373b0e5c74586a472cc1986306, type: 2}
+    ID: 0
+    <DebugObject>k__BackingField: {fileID: 6347815660822913642}

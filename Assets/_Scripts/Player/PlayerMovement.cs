@@ -9,10 +9,12 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 moveInput;
     private bool isSprinting;
     private bool isMoving;
+    private bool lockMovement;
 
     #region [Components]
     private Rigidbody2D rb;
     private Animator anim;
+    private PlayerInteraction interact;
     #endregion
 
     #region [Unity Lifecycle]
@@ -20,6 +22,7 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponentInChildren<Animator>();
+        interact = GetComponent<PlayerInteraction>();
     }
 
     private void Update()
@@ -38,6 +41,12 @@ public class PlayerMovement : MonoBehaviour
     #region [Input]
     private void HandleInput()
     {
+        if (interact.PuzzleOpen || lockMovement)
+        {
+            moveInput = Vector2.zero;
+            return;
+        }
+
         moveInput = InputManager.Instance.GetPlayerMovement();
         moveInput.y = 0f;
 
@@ -48,9 +57,17 @@ public class PlayerMovement : MonoBehaviour
     #region [Movement]
     private void HandleMoving()
     {
+        if (lockMovement) return;
+
         isSprinting = InputManager.Instance.GetPlayerSprinting();
         float speed = isSprinting ? runSpeed : walkSpeed;
         rb.linearVelocity = new Vector2(moveInput.x * speed, rb.linearVelocity.y);
+        isMoving = Mathf.Abs(moveInput.x) > 0.01f;
+    }
+
+    public void LockMovement()
+    {
+        lockMovement = true;
     }
     #endregion
 
@@ -59,10 +76,13 @@ public class PlayerMovement : MonoBehaviour
     {
         if (anim == null) return;
 
-        isMoving = Mathf.Abs(moveInput.x) > 0.01f;
-
         anim.SetBool("isWalking", isMoving && !isSprinting);
         anim.SetBool("isRunning", isMoving && isSprinting);
+    }
+
+    public void SetCutsceneMoving(bool moving)
+    {
+        isMoving = moving;
     }
     #endregion
 
